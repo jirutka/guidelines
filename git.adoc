@@ -1,0 +1,211 @@
+= Git guidelines
+Jakub Jirutka
+// URIs
+:uri-git-scm: https://git-scm.com
+
+This guide aims to provide the ground rules and recommendations for using {uri-git-scm}[git] in software projects with releases.
+
+The described rules are based on widely recognized best-practices for using git (see <<References, references>>).
+The workflow is based on https://docs.gitlab.com/ee/workflow/gitlab_flow.html[GitLab Flow].
+
+To keep it short and easy to follow, it does not explain reasons for particular rules and alternative approaches.
+If you’re in doubt, consult articles in the <<References>> section — they explain most of the concepts into a great detail.
+
+
+== General
+
+=== Commit content
+
+. Every commit should be atomic.
++
+____
+atomic: of or forming a single irreducible unit or component in a larger system
+____
++
+TODO
+
+. Do not commit generated files.
++
+TODO
+
+. Do not copy third-party files, if they can be reliably obtained from some repository.
++
+Prefer dependency management tools (e.g. Bundler, Cargo, npm) to fetch project dependencies instead of copying them into your repository.
+If this option is not available, but the third-party code is hosted in a git repository, use {uri-git-scm}/docs/git-submodule[git-submodule] or {uri-git-scm}/book/en/v1/Git-Tools-Subtree-Merging[git-subtree].
+
+. Avoid files and directories with name that differ only in capitalization.
+
+. Use only ASCII letters, digits, hyphen, underscore, and dot in names of files and directories.
+
+
+=== Commit author
+
+. Use your real name (or pseudonym) and valid email address in your Git identity.
+. Always use the same identity for each repository.
+
+You can set the default identity globally, or even per repository (just remove `--global`):
+
+[source,sh]
+----
+git config --global user.name "Kevin Flynn"
+git config --global user.email "kevin@flynnsarcade.com"
+----
+
+
+=== Commit message
+
+A commit message must begin with a single short line summarizing the change.
+It may be followed by a single blank line and then a more thorough description.
+
+The text up to the first blank line is called _a subject_ and is treated as the commit title.
+The rest is called _a body_.
+
+. Limit the subject line to 69 characters.
+
+. Start the subject line with a capital letter.
+
+. Do not end the subject line with a period.
++
+----
+// Bad
+Remove redundant periods.
+
+// Good
+Remove redundant periods
+----
+
+. Use the imperative mood in the subject line.
++
+----
+// Bad
+Refactored REST module for better readability
+Refactoring REST module for better readability
+
+// Good
+Refactor REST module for better readability
+----
+
+. Wrap the body at 72 characters.
+
+. Use the body to explain _what_ and _why_, not _how_.
++
+Focus on making clear the reasons why you made the change in the first place: how the things worked before the change (and what was wrong with that), the way they work now, and why you decided to solve it the way you did.
+How you implemented the change should be obvious from the code.
+
+. Mention related issues at the end of the body or subject line.
++
+----
+Fix bug causing occasional battery explosion
+
+Resolves #666
+See also #123
+----
++
+----
+Fix bug causing occasional battery explosion (resolves #666)
+----
+
+
+=== Tags
+
+. Avoid naming conflicts between tags, branches, and SHA1 identifiers.
+. Use tag with prefix `v` to mark (pre-)release (e.g. `v1.2.3`, `v1.2.3-rc1`).
+. Never, ever remove or change already published _release tag_.
+
+
+
+== Workflow
+
+The following description assumes that you use http://semver.org/[Semantic Versioning], but the workflow can be modified even for other versioning schemes.
+
+
+=== Master branch
+
+The default branch which exists since the repository creation.
+It’s also the primary branch in this workflow — every other branch starts from master.
+
+. The master branch must be always deployable, i.e. fully working.
+. Do not commit directly to master, create a topic branch instead.
+. Perform code review and run all tests *before* merging into master.
+. Never do a force push into the master branch on the server.
+
+
+=== Release branches
+
+A release branch is created from master with each released _minor version_ `X.Y`.
+Recommended naming scheme is `stable/X.Y` or `X.Y-stable`. TODO ?
+
+Release branch is a long-lived branch used for porting bug fixes to the stable release `X.Y.z`.
+If possible, first merge the bug fixes into the master and then cherry-pick them into the release branch.
+Every time a bug fix is included, increment the _patch version_ (e.g. `X.Y.0` -> `X.Y.1`) and release it by setting a new tag.
+
+TODO
+
+
+=== Topic branches
+
+A topic branch (also called a feature branch) is a short-lived branch you create and use for a single particular feature, bug fix or whatever you’re working on.
+
+. Create a topic branch from the current HEAD of the master branch.
+. Regularly push your work to the branch of the same name on the server.
+. Feel free to rebase and force push into this branch until you open a pull request.
+. When the branch is ready for code review, or you need feedback or help, open a pull request.
+. Clean up the branch before merging into the master.
++
+TODO
+
+
+=== How to…
+
+==== Implement new feature or fix
+
+.Implementation phase
+. Create new topic branch from the _master_.
+. Start coding. Commit each fix or task you have done and regularly push your work to the same named branch on the server.
+. Update changelog.
+. Push your changes to the server and open a pull request.
+
+[start=5]
+.Code review phase
+. Ask co-workers to review your code.
+. Resolve issues found during review, commit them and push them into the topic branch (do not use rebase now).
+. Repeat the previous two steps until all issues are resolved.
+
+[start=8]
+.Merge phase
+. Clean up your branch; use interactive rebase to squash “checkpoint” commits and fixes... TODO
+. Rebase to master... TODO ?
+. Do a force push to your branch.
+. Ask the project’s maintainer to merge your changes into master.
+
+
+==== Release new version
+
+. Bump version number in project files (like `.gemspec`, `Cargo.toml`, …) and enter release date into changelog.
+. Commit changes into the _master_ with message “Release version X.Y.Z”.
+. If this is the first release with minor version `X.Y`, create a _release branch_ named `stable/X.Y`.
+. Create a _release tag_ `vX.Y.Z`.
+. Push changes to the server.
+
+
+==== Fix bug in released version
+
+. Fix the bug (in the _master branch_); follow the procedure <<Implement new feature or fix>>.
+. Cherry-pick commit(s) with the bug fix to the corresponding _release branch_.
+. <<Release new version,Release new patch version>>, but commit and push to the _release branch_ instead of _master_.
+
+
+
+== Tips
+
+TODO use command line, not IDE
+
+
+
+== References
+
+* https://docs.gitlab.com/ee/workflow/gitlab_flow.html[GitLab Flow] by GitLab Inc.
+* http://scottchacon.com/2011/08/31/github-flow.html[GitHub Flow] by Scott Chacon
+* http://chris.beams.io/posts/git-commit/[How to Write a Git Commit Message] by Chris Beams
+* https://www.freshconsulting.com/atomic-commits/[Developer Tip: Keep Your Commits “Atomic”] by Sean Patterson
+* https://sandofsky.com/blog/git-workflow.html[Understanding the Git Workflow] by Ben Sandofsky
