@@ -8,8 +8,8 @@ This guide aims to provide the ground rules and recommendations for using {uri-g
 The described rules are based on widely recognized best-practices for using git (see <<References, references>>).
 The workflow is based on https://docs.gitlab.com/ee/workflow/gitlab_flow.html[GitLab Flow].
 
-To keep it reasonably short and easier to follow, it does not explain _why_ are particular rules a good thing to do, nor alternative approaches.
-If you’re in doubt, you can consult articles in the <<References>> section — they explain most of the concepts into great detail.
+To keep it short and easy to follow, it does not explain reasons for particular rules and alternative approaches.
+If you’re in doubt, consult articles in the <<References>> section — they explain most of the concepts into a great detail.
 
 
 == General
@@ -31,7 +31,7 @@ TODO
 . Do not copy third-party files, if they can be reliably obtained from some repository.
 +
 Prefer dependency management tools (e.g. Bundler, Cargo, npm) to fetch project dependencies instead of copying them into your repository.
-If this option is not available, but the third-party code it hosted in a git repository, use {uri-git-scm}/docs/git-submodule[git-submodule] or {uri-git-scm}/book/en/v1/Git-Tools-Subtree-Merging[git-subtree].
+If this option is not available, but the third-party code is hosted in a git repository, use {uri-git-scm}/docs/git-submodule[git-submodule] or {uri-git-scm}/book/en/v1/Git-Tools-Subtree-Merging[git-subtree].
 
 . Avoid files and directories with name that differ only in capitalization.
 
@@ -89,7 +89,7 @@ Refactor REST module for better readability
 
 . Use the body to explain _what_ and _why_, not _how_.
 +
-Focus on making clear the reasons why you made the change in the first place — the way things worked before the change (and what was wrong with that), the way they work now, and why you decided to solve it the way you did.
+Focus on making clear the reasons why you made the change in the first place: how the things worked before the change (and what was wrong with that), the way they work now, and why you decided to solve it the way you did.
 How you implemented the change should be obvious from the code.
 
 . Mention related issues at the end of the body or subject line.
@@ -109,19 +109,19 @@ Fix bug causing occasional battery explosion (resolves #666)
 === Tags
 
 . Avoid naming conflicts between tags, branches, and SHA1 identifiers.
-. Use tag with prefix `v` to mark (pre-)release (e.g. `v1.2.3`, `v1.2.3_rc1`).
+. Use tag with prefix `v` to mark (pre-)release (e.g. `v1.2.3`, `v1.2.3-rc1`).
 . Never, ever remove or change already published _release tag_.
 
 
 
 == Workflow
 
-The following description assumes that you use http://semver.org/[Semantic Versioning], but the workflow can be modified even for other semantic versioning schemes.
+The following description assumes that you use http://semver.org/[Semantic Versioning], but the workflow can be modified even for other versioning schemes.
 
 
 === Master branch
 
-The default branch that exists since the repository creation.
+The default branch which exists since the repository creation.
 It’s also the primary branch in this workflow — every other branch starts from master.
 
 . The master branch must be always deployable, i.e. fully working.
@@ -135,22 +135,22 @@ It’s also the primary branch in this workflow — every other branch starts fr
 A release branch is created from master with each released _minor version_ `X.Y`.
 Recommended naming scheme is `stable/X.Y` or `X.Y-stable`. TODO ?
 
-It’s a long-lived branch used for porting bug fixes to the stable release `X.Y.z`.
-If possible these bug fixes should be first merged into master and then cherry-picked into the release branch.
-Every time a bug fix is included, the _patch version_ should be raised (e.g. `X.Y.0` -> `X.Y.1`) and released by setting a new tag.
+Release branch is a long-lived branch used for porting bug fixes to the stable release `X.Y.z`.
+If possible, first merge the bug fixes into the master and then cherry-pick them into the release branch.
+Every time a bug fix is included, increment the _patch version_ (e.g. `X.Y.0` -> `X.Y.1`) and release it by setting a new tag.
 
 TODO
 
 
 === Topic branches
 
-A topic branch (also called a feature branch) is a short-lived branch that you create and use for a single particular feature, bug fix or whatever you’re working on.
+A topic branch (also called a feature branch) is a short-lived branch you create and use for a single particular feature, bug fix or whatever you’re working on.
 
 . Create a topic branch from the current HEAD of the master branch.
-. Regularly push your work to the same named branch on the server.
+. Regularly push your work to the branch of the same name on the server.
 . Feel free to rebase and force push into this branch until you open a pull request.
 . When the branch is ready for code review, or you need feedback or help, open a pull request.
-. Clean up the branch before merging into master.
+. Clean up the branch before merging into the master.
 +
 TODO
 
@@ -160,15 +160,15 @@ TODO
 ==== Implement new feature or fix
 
 .Implementation phase
-. Create new topic branch from _master_.
-. Start coding. Commit separately each fix or task you done and regularly push your work to the same named branch on the server.
+. Create new topic branch from the _master_.
+. Start coding. Commit each fix or task you have done and regularly push your work to the same named branch on the server.
 . Update changelog.
 . Push your changes to the server and open a pull request.
 
 [start=5]
 .Code review phase
 . Ask co-workers to review your code.
-. Resolve found issues, commit them and push into the topic branch (do not use rebase now).
+. Resolve issues found during review, commit them and push them into the topic branch (do not use rebase now).
 . Repeat the previous two steps until all issues are resolved.
 
 [start=8]
@@ -181,8 +181,8 @@ TODO
 
 ==== Release new version
 
-. Bump version number in project files (like `.gemspec`, `Cargo.toml`, …) and fill release date in changelog.
-. Commit changes into _master_ with message “Release version X.Y.Z”.
+. Bump version number in project files (like `.gemspec`, `Cargo.toml`, …) and enter release date into changelog.
+. Commit changes into the _master_ with message “Release version X.Y.Z”.
 . If this is the first release with minor version `X.Y`, create a _release branch_ named `stable/X.Y`.
 . Create a _release tag_ `vX.Y.Z`.
 . Push changes to the server.
